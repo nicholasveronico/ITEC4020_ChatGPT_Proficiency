@@ -1,0 +1,276 @@
+/* General transitions for all elements */
+* {
+    transition: all 0.1s ease-in-out;
+}
+
+/* Add space between divs */
+div {
+    padding-bottom: 10px;
+}
+
+/* Add space below heading */
+h1 {
+    padding-bottom: 10px;
+}
+
+/* Container bottom styling */
+.container.bottom {
+    margin-bottom: 60px;
+    padding-bottom: 60px;
+}
+
+/* Chart canvas styling */
+.chart-canvas {
+    margin-bottom: 20px;
+}
+
+/* Remove bullet points from unordered list */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+/* Hover effect for links */
+a {
+    transition: color 0.3s ease-in-out;
+}
+
+a:hover {
+    color: #007bff;
+}
+
+/* Keyframes for moving icons */
+@keyframes move {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Apply moving animation to icons */
+i {
+    display: inline-block;
+    animation: move 2s infinite;
+}
+
+/* Specific styling for the ChatGPT symbol */
+.chatgpt-symbol {
+    font-size: 100px;
+    color: #4CAF50;
+    animation: move 2s infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+}
+
+
+
+
+
+
+
+
+
+
+:root {
+    --size: 150px;
+  }
+  
+  .base {
+    width: calc(var(--size) * 2);
+    height: calc(var(--size) * 2);
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  
+  .circ {
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    border: 10px solid white;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  
+  /* Positioning circles */
+  .base .circ:nth-child(1) {
+    transform: translate(calc(var(--size) * 0.5), 0);
+  }
+  
+  .base .circ:nth-child(2) {
+    transform: translate(0, calc(var(--size) * 0.5));
+  }
+  
+  .base .circ:nth-child(3) {
+    transform: translate(calc(var(--size) * -0.5), 0);
+  }
+  
+  .base .circ:nth-child(4) {
+    transform: translate(0, calc(var(--size) * -0.5));
+  }
+  
+  .base .circ:nth-child(5) {
+    transform: translate(calc(var(--size) * 0.5 * 0.7071), calc(var(--size) * 0.5 * 0.7071));
+  }
+  
+  .base .circ:nth-child(6) {
+    transform: translate(calc(var(--size) * 0.5 * 0.7071), calc(var(--size) * -0.5 * 0.7071));
+  }
+  
+  .base .circ:nth-child(7) {
+    transform: translate(calc(var(--size) * -0.5 * 0.7071), calc(var(--size) * 0.5 * 0.7071));
+  }
+  
+  .base .circ:nth-child(8) {
+    transform: translate(calc(var(--size) * -0.5 * 0.7071), calc(var(--size) * -0.5 * 0.7071));
+  }
+  
+  /* Rotations and animations for each base */
+  .base:nth-child(2) {
+    transform: rotate(0.1turn);
+  }
+  
+  .base:nth-child(3) {
+    transform: rotate(0.2turn);
+  }
+  
+  .base:nth-child(4) {
+    transform: rotate(0.3turn);
+  }
+  
+  .base:nth-child(5) {
+    transform: rotate(0.4turn);
+  }
+  
+  .base:nth-child(6) {
+    transform: rotate(0.5turn);
+  }
+  
+  .base:nth-child(7) {
+    transform: rotate(0.6turn);
+  }
+  
+  .base:nth-child(8) {
+    transform: rotate(0.7turn);
+  }
+  
+  /* Keyframe animations */
+  @keyframes turn-2 {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(calc(2 * (1 / 8) * 1turn));
+    }
+  }
+  
+  @keyframes turn-3 {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(calc(3 * (1 / 8) * 1turn));
+    }
+  }
+  
+  @keyframes turn-4 {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(calc(4 * (1 / 8) * 1turn));
+    }
+  }
+  
+  @keyframes turn-5 {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(calc(5 * (1 / 8) * 1turn));
+    }
+  }
+  
+  @keyframes turn-6 {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(calc(6 * (1 / 8) * 1turn));
+    }
+  }
+  
+  @keyframes turn-7 {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(calc(7 * (1 / 8) * 1turn));
+    }
+  }
+  
+  @keyframes turn-8 {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(calc(8 * (1 / 8) * 1turn));
+    }
+  }
+  
+  /* Animation assignments */
+  .base:nth-child(2) {
+    animation: turn-2 3s ease-in-out infinite alternate;
+  }
+  
+  .base:nth-child(3) {
+    animation: turn-3 4.5s ease-in-out infinite alternate;
+  }
+  
+  .base:nth-child(4) {
+    animation: turn-4 6s ease-in-out infinite alternate;
+  }
+  
+  .base:nth-child(5) {
+    animation: turn-5 7.5s ease-in-out infinite alternate;
+  }
+  
+  .base:nth-child(6) {
+    animation: turn-6 9s ease-in-out infinite alternate;
+  }
+  
+  .base:nth-child(7) {
+    animation: turn-7 10.5s ease-in-out infinite alternate;
+  }
+  
+  .base:nth-child(8) {
+    animation: turn-8 12s ease-in-out infinite alternate;
+  }
+  
+  /* Background for circles in other bases */
+  .base:nth-child(n+2) .circ {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  
+
+.container.intro {
+  padding-bottom:440px;
+}

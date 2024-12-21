@@ -1,0 +1,431 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+header {
+    background-color: var(--nav-bg-color);
+    padding: 10px 0;
+    transition: background-color 0.5s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Flexbox Navigation */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 80%;
+    margin: 0 auto;
+    padding: 0 10px;
+    font-size: 1rem;
+    overflow: hidden;
+    flex-wrap: nowrap;
+}
+
+.navbar.dark-mode {
+    background-color: var(--nav-bg-color);
+}
+
+/* Navigation Links Styling */
+.nav-items {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+.nav-items a {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--nav-text-color);
+    transition: color 0.5s ease;
+}
+
+.nav-items li a:hover {
+    color: var(--button-bg-color);
+}
+
+/* Individual Link Styling */
+.nav-items li a {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--nav-text-color);
+    transition: color 0.5s ease;
+}
+
+/* Theme toggle button styling */
+#themeToggle {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#themeToggle:hover {
+    opacity: 0.9;
+}
+
+#themeToggle i {
+    pointer-events: none;
+}
+
+/* Container styling */
+.container {
+    padding: 60px 30px;
+    max-width: 800px;
+    width: 70%;
+    margin: 100px auto 0;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+}
+
+body.dark-mode .container {
+    background-color: var(--bg-color);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Form styling */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form div {
+    margin-bottom: 10px;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+body.dark-mode input[type="text"] {
+    background-color: #3e3e3e;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+/* Button styling */
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+body.dark-mode button {
+    background-color: #0056b3;
+}
+
+body.dark-mode button:hover {
+    background-color: #003f7f;
+}
+
+/* Result styling */
+#result {
+    margin-top: 20px;
+    white-space: pre-wrap;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+select {
+    max-width: 200px;
+    overflow-x: auto;
+}
+
+#collectionData {
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+body.dark-mode #collectionData {
+    scrollbar-color: #555 #2e2e2e;
+}
+
+body.dark-mode #result {
+    background-color: #2e2e2e;
+    border: 1px solid #555;
+    scrollbar-color: #555 #2e2e2e;
+}
+
+/* Navbar separator */
+.navbar-separator {
+    height: 60px; 
+}
+
+/* Dark Mode Styling */
+body.dark-mode {
+    --bg-color: #1c1f26;  /* Dark background */
+    --text-color: #e0e0e0; /* Light text */
+    --nav-bg-color: #14161b; /* Darker navbar/footer */
+    --nav-text-color: #f0f0f0; /* Light navbar text */
+    --button-bg-color: #3b4d61; /* Button color */
+    --button-text-color: #f0f0f0; /* Button text color */
+    --navbar-border-color: #444; /* Dark border for dark mode */
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+body {
+    --navbar-border-color: #ccc; /* Light border for light mode */
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+    .nav-items {
+        gap: 15px; 
+    }
+
+    .nav-items a {
+        font-size: 0.9rem;
+    }
+
+    nav {
+        max-width: 90%; 
+    }
+}
+
+@media (max-width: 480px) {
+    nav {
+        padding: 0 10px;
+        max-width: 95%;
+    }
+
+    .nav-items {
+        gap: 10px;
+    }
+
+    .nav-items a {
+        font-size: 0.7rem;
+    }
+
+    #themeToggle {
+        padding: 8px;
+        font-size: 16px;
+    }
+
+    .container {
+        padding: 20px 10px;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    p {
+        font-size: 0.9rem;
+    }
+}
+
+
+
+
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Ensure full height for sticky footer layout */
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Content should take up remaining space */
+main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* Footer styles */
+footer {
+    background-color: white;
+    color: #2e3537;
+    text-align: center;
+    padding: 1em 0;
+    border-top: 1px solid black;
+    bottom: 0;
+    width: 100%;
+    margin-top: auto;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+    font-size: 1rem;
+    padding-top: 20px;
+}
+
+footer a {
+    color: black;
+    text-decoration: none;
+    margin: 0 1em;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+body.dark-mode footer {
+    background-color: #1e1e1e;
+    border-top: 1px solid white;
+}
+
+body.dark-mode footer a {
+    color: #e0e0e0;
+}
+
+footer .footer-icon {
+    padding: 10px;
+}
+
+
+form div {
+    margin-bottom: 15px;
+}
+
+form label {
+    margin-bottom: 5px;
+}
+
+div {
+    padding-bottom: 10px;
+}
+
+h1 {
+    padding-bottom: 10px;
+}
+
+.container.bottom {
+    margin-bottom: 60px;
+    padding-bottom: 60px;
+}
+
+.chart-canvas {
+    margin-bottom: 20px;
+}
+
+/* Remove bullet points from unordered list */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+
+/* Chat container styling */
+.container.chat {
+    padding: 20px;
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#chatContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#chatMessages {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.user-message {
+    text-align: right;
+    margin: 5px 0;
+    padding: 5px 10px;
+    background-color: #e1ffc7;
+    border-radius: 5px;
+}
+
+.bot-message {
+    text-align: left;
+    margin: 5px 0;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.error-message {
+    text-align: center;
+    margin: 5px 0;
+    padding: 5px 10px;
+    background-color: #ffcccc;
+    border-radius: 5px;
+    color: #d8000c;
+}
+
+#chatForm {
+    display: flex;
+    width: 100%;
+}
+
+#chatInput {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+}
+
+#chatForm .btn {
+    padding: 10px 20px;
+    border-radius: 0 5px 5px 0;
+}

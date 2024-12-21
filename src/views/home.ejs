@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Project</title>
+    <link rel="stylesheet" href="../css/style.css" type="text/css">
+    <link rel="stylesheet" href="../css/transitions.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='85' font-size='90'>🚀</text></svg>">
+</head>
+<body>
+    <header>
+        <%- include('./partials/nav.ejs') %>
+    </header>
+
+    <div class="container intro">
+        <h1>AI Efficiency Validation</h1>
+        <p>
+            Thank you for visiting we hope you enjoy your stay! We invite you to check out the <a href="/about">About</a> section for project details and our portfolios. 
+            Additionally, visit the <a href="/results">Results</a> section to see our findings and analysis on the accuracy of ChatGPT's 4.0 model.
+        </p>
+    </div>
+
+    <div>
+        <div class="base">
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+          </div>
+          <div class="base">
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+          </div>
+          <div class="base">
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+          </div>
+          <div class="base">
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+          </div>
+          <div class="base">
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+          </div>
+          <div class="base">
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+          </div>
+          <div class="base">
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+          </div>
+          <div class="base">
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+            <div class="circ"></div>
+          </div>
+    </div>
+
+    <div class="container bottom">
+        <h1>ChatGPT Project</h1>
+        <h3>Select a collection and answered question to view the document!</h3>
+        <br><br>
+        <form id="questionForm">
+            <div>
+                <label for="collectionSelect">Select Collection:</label>
+                <select id="collectionSelect" name="collectionName" required>
+                    <option value="">Select a collection</option>
+                </select>
+            </div>
+            <div>
+                <label for="questionSelect">Select Question:</label>
+                <select id="questionSelect" name="questionId" required>
+                    <option value="">Select a question</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Submit</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script src="../scripts/themeToggle.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const collectionSelect = document.getElementById('collectionSelect');
+            const questionSelect = document.getElementById('questionSelect');
+            const loadingOption = document.createElement('option');
+            loadingOption.text = 'Loading collections...';
+            collectionSelect.add(loadingOption);
+
+            try {
+                const response = await fetch('/api/collections');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const collections = await response.json();
+
+                // Clear loading option
+                collectionSelect.innerHTML = '';
+
+                // Add default option
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.text = 'Select a collection';
+                collectionSelect.add(defaultOption);
+
+                // Add collections
+                collections.forEach(collection => {
+                    const option = document.createElement('option');
+                    option.value = collection;
+                    option.text = collection;
+                    collectionSelect.add(option);
+                });
+
+            } catch (error) {
+                collectionSelect.innerHTML = '<option value="">Error loading collections</option>';
+            }
+
+            // Handle collection selection for questions
+            collectionSelect.addEventListener('change', async (event) => {
+                const collectionName = event.target.value;
+                questionSelect.innerHTML = '<option value="">Loading questions...</option>';
+
+                try {
+                    const response = await fetch(`/api/collections/${collectionName}?answered=true`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const questions = await response.json();
+                    
+                    questionSelect.innerHTML = '<option value="">Select a question</option>';
+                    questions.questions.forEach(question => {
+                        const option = document.createElement('option');
+                        option.value = question._id;
+                        option.text = question.question;
+                        questionSelect.add(option);
+                    });
+                } catch (error) {
+                    questionSelect.innerHTML = '<option value="">Error loading questions</option>';
+                }
+            });
+
+            // Handle single question form submission
+            document.getElementById('questionForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const collectionName = document.getElementById('collectionSelect').value;
+                const questionId = document.getElementById('questionSelect').value;
+                const resultDiv = document.getElementById('result');
+
+                try {
+                    resultDiv.innerHTML = 'Loading...';
+                    const response = await fetch(`/api/collections/${collectionName}/question/${questionId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    resultDiv.innerHTML = `<br><div class="bot-message"><pre>${JSON.stringify(result, null, 2)}</pre></div>`;
+                } catch (error) {
+                    resultDiv.innerHTML = '<br>An error occurred while fetching the question.';
+                }
+            });
+        });
+    </script>
+
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7a8e5e7cfeac63',t:'MTczMjQ2MzQ0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7aa7126c70aae5',t:'MTczMjQ2NDQ1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7aa8f10ce4542b',t:'MTczMjQ2NDUzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7aa97749beaabf',t:'MTczMjQ2NDU1MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7aaabe8bd6a232',t:'MTczMjQ2NDYwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7aafd96ee3a244',t:'MTczMjQ2NDgxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7ab054ec2eab72',t:'MTczMjQ2NDgzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7ab19accf8ab34',t:'MTczMjQ2NDg4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7abc5b2b91ab54',t:'MTczMjQ2NTMyNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7abd326dc0a1e4',t:'MTczMjQ2NTM1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7abf573fbdaac8',t:'MTczMjQ2NTQ0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7ac3221e5fac4b',t:'MTczMjQ2NTYwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7ac66b5f38ac8d',t:'MTczMjQ2NTczNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+
+
+
+<%- include('./partials/footer.ejs') %>
+    </body>
+</html>

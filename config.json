@@ -1,0 +1,17 @@
+{
+    "web": {
+        "port": 3000
+    },
+    "mongodb": {
+        "url": "mongodb://localhost:27017"
+    },
+    "spreadsheets": {
+        "computer_security": "computer_security.csv",
+        "history": "history.csv",
+        "social_science": "social_science.csv"
+    },
+    "api": {
+        "openaiKey": "",
+        "prompt": ""
+    }
+}

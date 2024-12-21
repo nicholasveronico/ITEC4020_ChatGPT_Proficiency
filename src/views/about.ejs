@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - ChatGPT Project</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/transitions.css" typr="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='85' font-size='90'>🚀</text></svg>">
+</head>
+<body>
+    <header>
+        <%- include('./partials/nav.ejs') %>
+    </header>
+    <div class="container">
+        <h1>Project Overview</h1>
+        <p>
+        Welcome to the ChatGPT Project! This project involves processing and analyzing questions using OpenAI's ChatGPT. 
+        We have implemented various functionalities including single question processing, batch question processing, 
+        and displaying metrics and charts to visualize the performance of ChatGPT. You can select a collection of questions, 
+        process them, and view the results in a structured format. Additionally, you can filter and fetch collections based on 
+        their answered status and visualize the data using interactive charts.
+        </p>
+
+        <div><h1><br><br><i class="fas fa-robot"></i></h1></div>
+    </div>
+
+    <div class="container">
+        <h1>About Us</h1>
+        <p>
+        We are passionate developers who have worked on this project to showcase the capabilities of OpenAI's ChatGPT. 
+        Below are our ePortfolios where you can learn more about our work and projects.
+        </p>
+        <div><h1><br><br><i class="fas fa-user"></i></h1></div>
+    </div>
+
+    <div class="container bottom">
+        <h1>Our ePortfolios</h1>
+            <a href="https://erictracc.github.io/Eric-Portfolio/" target="_blank">Eric Traccitto's ePortfolio</a></li>
+            <br>
+            <a href="https://nicholasveronico.github.io/Portfolio/" target="_blank">Nicholas Veronico's ePortfolio</a></li>
+
+        <div><h1><br><br><i class="fas fa-briefcase"></i></h1></div>
+    </div>
+
+    <script src="../scripts/themeToggle.js"></script>
+    <%- include('./partials/footer.ejs') %>
+</body>
+</html>

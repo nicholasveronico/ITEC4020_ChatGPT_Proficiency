@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis - ChatGPT Project</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/transitions.css" typr="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='85' font-size='90'>🚀</text></svg>">
+</head>
+<body>
+    <header>
+        <%- include('./partials/nav.ejs') %>
+    </header>
+
+    <div class="container">
+        <h1>Single Question Processing</h1>
+        <br><br>
+        <form id="questionForm">
+            <div>
+                <label for="collectionSelect">Select Collection:</label>
+                <select id="collectionSelect" name="collectionName" required>
+                    <option value="">Select a collection</option>
+                </select>
+            </div>
+            <div>
+                <label for="questionSelect">Select Question:</label>
+                <select id="questionSelect" name="questionId" required>
+                    <option value="">Select a question</option>
+                </select>
+            </div>
+            <button type="submit" class="submit-button">Process Question</button>
+        </form>
+        <div id="questionResult"></div>
+    </div>
+
+    <div class="container">
+        <h1>Batch Question Processing</h1>
+        <br><br>
+        <form id="batchForm">
+            <div>
+                <label for="batchCollectionSelect">Select Collection:</label>
+                <select id="batchCollectionSelect" name="collectionName" required>
+                    <option value="">Select a collection</option>
+                </select>
+            </div>
+            <button type="submit" class="submit-button">Process All Questions</button>
+        </form>
+        <div id="batchResult"></div>
+    </div>
+
+    <div class="container">
+        <h1>Metrics and Charts</h1>
+        <br><br>
+        <button id="updateChartsButton">Refresh Charts</button>
+        <br>
+        <div id="chartsContainer">
+            <canvas id="accuracyChart" class="chart-canvas" width="400" height="200"></canvas><br><br>
+            <canvas id="distributionChart" class="chart-canvas" width="400" height="200"></canvas><br><br>
+            <canvas id="timeComparisonChart" class="chart-canvas" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Collection Results</h1>
+        <br><br>
+        <form id="collectionForm">
+            <div>
+                <label for="collectionSelectResults">Select Collection:</label>
+                <select id="collectionSelectResults" name="collectionName" required>
+                    <option value="">Select a collection</option>
+                </select>
+            </div>
+            <div>
+                <label for="answered">Filter by Answered Status:</label>
+                <select id="answered" name="answered">
+                    <option value="all">All</option>
+                    <option value="true">Answered</option>
+                    <option value="false">Unanswered</option>
+                </select>
+            </div>
+            <button type="submit" class="submit-button">Fetch Collection</button>
+        </form>
+        <div id="collectionData"></div>
+    </div>
+
+    <div class="container bottom">
+        <h1>Clear Collection</h1>
+        <br><br>
+        <form id="clearCollectionForm">
+            <div>
+                <label for="clearCollectionSelect">Select Collection:</label>
+                <select id="clearCollectionSelect" name="collectionName" required>
+                    <option value="">Select a collection</option>
+                </select>
+            </div>
+            <button type="submit" class="submit-button">Clear Collection</button>
+        </form>
+        <div id="clearCollectionResult"></div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const collectionSelect = document.getElementById('collectionSelect');
+        const questionSelect = document.getElementById('questionSelect');
+        const collectionSelectResults = document.getElementById('collectionSelectResults');
+        const batchCollectionSelect = document.getElementById('batchCollectionSelect');
+        const clearCollectionSelect = document.getElementById('clearCollectionSelect');
+        const loadingOption = document.createElement('option');
+        loadingOption.text = 'Loading collections...';
+        collectionSelect.add(loadingOption);
+        collectionSelectResults.add(loadingOption.cloneNode(true));
+        batchCollectionSelect.add(loadingOption.cloneNode(true));
+        clearCollectionSelect.add(loadingOption.cloneNode(true));
+
+        try {
+            const response = await fetch('/api/collections');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const collections = await response.json();
+
+            // Clear loading option
+            collectionSelect.innerHTML = '';
+            collectionSelectResults.innerHTML = '';
+            batchCollectionSelect.innerHTML = '';
+            clearCollectionSelect.innerHTML = '';
+
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.text = 'Select a collection';
+            collectionSelect.add(defaultOption);
+            collectionSelectResults.add(defaultOption.cloneNode(true));
+            batchCollectionSelect.add(defaultOption.cloneNode(true));
+            clearCollectionSelect.add(defaultOption.cloneNode(true));
+
+            // Add collections
+            collections.forEach(collection => {
+                const option = document.createElement('option');
+                option.value = collection;
+                option.text = collection;
+                collectionSelect.add(option);
+                collectionSelectResults.add(option.cloneNode(true));
+                batchCollectionSelect.add(option.cloneNode(true));
+                clearCollectionSelect.add(option.cloneNode(true));
+            });
+        } catch (error) {
+            collectionSelect.innerHTML = '<option value="">Error loading collections</option>';
+            collectionSelectResults.innerHTML = '<option value="">Error loading collections</option>';
+            batchCollectionSelect.innerHTML = '<option value="">Error loading collections</option>';
+            clearCollectionSelect.innerHTML = '<option value="">Error loading collections</option>';
+        }
+
+        // Handle collection selection for questions
+        collectionSelect.addEventListener('change', async (event) => {
+            const collectionName = event.target.value;
+            questionSelect.innerHTML = '<option value="">Loading questions...</option>';
+
+            try {
+                const response = await fetch(`/api/collections/${collectionName}?answered=false`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const questions = await response.json();
+                
+                questionSelect.innerHTML = '<option value="">Select a question</option>';
+                questions.questions.forEach(question => {
+                    const option = document.createElement('option');
+                    option.value = question._id;
+                    option.text = question.question;
+                    questionSelect.add(option);
+                });
+            } catch (error) {
+                questionSelect.innerHTML = '<option value="">Error loading questions</option>';
+            }
+        });
+
+        // Handle single question form submission
+        document.getElementById('questionForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const documentId = document.getElementById('questionSelect').value;
+            const collectionName = document.getElementById('collectionSelect').value;
+            const resultDiv = document.getElementById('questionResult');
+
+            try {
+                resultDiv.innerHTML = '<br>Processing...';
+                const response = await fetch('/api/collections', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        id: documentId, 
+                        collectionName: collectionName,
+                        process_all: false
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                resultDiv.innerHTML = `<br>The question was processed! ChatGPT's answer was "${result.question.chatgpt.answer}," and the correct answer was "${result.question.correct_answer}". <br> It took ChatGPT ${result.question.chatgpt.time_taken}ms to answer the question.`;
+            } catch (error) {
+                resultDiv.innerHTML = '<br>An error occurred while processing the question.';
+            }
+        });
+
+        // Handle batch question form submission
+        document.getElementById('batchForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const collectionName = document.getElementById('batchCollectionSelect').value;
+            const resultDiv = document.getElementById('batchResult');
+
+            try {
+                resultDiv.innerHTML = '<br>Processing...';
+                const response = await fetch('/api/collections', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        collectionName: collectionName,
+                        process_all: true
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.message === 'No unanswered questions found.') {
+                    resultDiv.innerHTML = `<br>No unanswered questions found for ${collectionName}.`;
+                    return;
+                }
+                resultDiv.innerHTML = `<br>All ${result.processed} questions for ${collectionName} have been processed!`;
+            } catch (error) {
+                resultDiv.innerHTML = '<br>An error occurred while processing the batch questions.';
+            }
+        });
+
+        // Handle clear collection form submission
+        document.getElementById('clearCollectionForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const collectionName = document.getElementById('clearCollectionSelect').value;
+            const resultDiv = document.getElementById('clearCollectionResult');
+
+            try {
+                resultDiv.innerHTML = '<br>Clearing...';
+                const response = await fetch(`/api/collections/${collectionName}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                resultDiv.innerHTML = `<br>The collection ${collectionName} has been cleared!`;
+            } catch (error) {
+                resultDiv.innerHTML = '<br>An error occurred while clearing the collection.';
+            }
+        });
+
+        // Handle collection form submission
+        document.getElementById('collectionForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const collectionName = document.getElementById('collectionSelectResults').value;
+            const answered = document.getElementById('answered').value;
+            const collectionDataDiv = document.getElementById('collectionData');
+
+            try {
+                collectionDataDiv.innerHTML = '<br>Loading...';
+                const response = await fetch(`/api/collections/${collectionName}?answered=${answered}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const documents = await response.json();
+                collectionDataDiv.innerHTML = `<br><div class="bot-message"><pre>${JSON.stringify(documents, null, 2)}</pre></div>`;
+            } catch (error) {
+                collectionDataDiv.innerHTML = '<br>An error occurred while fetching the collection documents.';
+            }
+        });
+    });
+    </script>
+
+    <script src="../scripts/themeToggle.js"></script>
+    <script src="../scripts/metrics.js"></script>
+
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7a8e5e7cfeac63',t:'MTczMjQ2MzQ0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7aa7126c70aae5',t:'MTczMjQ2NDQ1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7aa8f10ce4542b',t:'MTczMjQ2NDUzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7aa97749beaabf',t:'MTczMjQ2NDU1MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7aaabe8bd6a232',t:'MTczMjQ2NDYwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7aafd96ee3a244',t:'MTczMjQ2NDgxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7ab054ec2eab72',t:'MTczMjQ2NDgzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7ab19accf8ab34',t:'MTczMjQ2NDg4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7abc5b2b91ab54',t:'MTczMjQ2NTMyNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7abd326dc0a1e4',t:'MTczMjQ2NTM1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7abf573fbdaac8',t:'MTczMjQ2NTQ0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7ac3221e5fac4b',t:'MTczMjQ2NTYwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'8e7ac66b5f38ac8d',t:'MTczMjQ2NTczNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+
+<%- include('./partials/footer.ejs') %>
+
+</body>
+</html>
